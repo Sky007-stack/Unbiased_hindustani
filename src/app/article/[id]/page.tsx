@@ -1,255 +1,304 @@
-'use client';
+import React from 'react';
+import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import FactCheckButton from '@/components/FactCheckButton';
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+export const revalidate = 60;
 
-interface NewsArticle {
-  id: number;
-  title: string;
-  summaryPoints: string[];
-  youtubeUrl: string;
-  fullContent?: string;
-}
+const categoryIcons: Record<string, string> = {
+  Politics: '🏛️',
+  Technology: '💻',
+  Business: '📈',
+  Sports: '⚽',
+  Entertainment: '🎬',
+  Science: '🔬',
+  World: '🌍',
+  Education: '📚',
+  Health: '🏥',
+  Environment: '🌿',
+};
 
-export default function ArticlePage({ params }: { params: { id: string } }) {
-  const [article, setArticle] = useState<NewsArticle | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+export default async function ArticlePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const articleId = parseInt(id);
 
-  useEffect(() => {
-    const loadArticle = () => {
-      try {
-        // Try localStorage first
-        const newsData = localStorage.getItem('newsData');
-        if (newsData) {
-          const data = JSON.parse(newsData);
-          const allNews: NewsArticle[] = data.newsItems || data || [];
-          const foundArticle = allNews.find((news) => news.id === parseInt(params.id));
-          if (foundArticle) {
-            setArticle(foundArticle);
-            setLoading(false);
-            return;
-          }
-        }
-
-        // Fallback to admin-news.json
-        fetch('/admin-news.json')
-          .then((res) => res.json())
-          .then((data) => {
-            const allNews: NewsArticle[] = data.newsItems || data || [];
-            const foundArticle = allNews.find((news) => news.id === parseInt(params.id));
-            if (foundArticle) {
-              setArticle(foundArticle);
-            }
-            setLoading(false);
-          })
-          .catch((error) => {
-            console.error('Error loading article:', error);
-            setLoading(false);
-          });
-      } catch (error) {
-        console.error('Error:', error);
-        setLoading(false);
-      }
-    };
-
-    loadArticle();
-  }, [params.id]);
-
-  // Function to get YouTube thumbnail
-  const getYouTubeThumbnail = (url: string) => {
-    try {
-      let videoId = '';
-      
-      if (url.includes('/embed/')) {
-        videoId = url.split('/embed/')[1].split('?')[0];
-      } else if (url.includes('watch?v=')) {
-        const urlObj = new URL(url);
-        videoId = urlObj.searchParams.get('v') || '';
-      } else if (url.includes('youtu.be/')) {
-        videoId = url.split('youtu.be/')[1].split('?')[0];
-      }
-      
-      if (videoId) {
-        return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-      }
-    } catch (e) {
-      console.error('Error extracting thumbnail:', e);
-    }
-    
-    return '/leaders/default.jpg';
-  };
-
-  // Function to handle video click
-  const handleVideoClick = () => {
-    if (!article) return;
-    
-    let videoId = '';
-    
-    try {
-      if (article.youtubeUrl.includes('/embed/')) {
-        videoId = article.youtubeUrl.split('/embed/')[1].split('?')[0];
-      } else if (article.youtubeUrl.includes('watch?v=')) {
-        const urlObj = new URL(article.youtubeUrl);
-        videoId = urlObj.searchParams.get('v') || '';
-      } else if (article.youtubeUrl.includes('youtu.be/')) {
-        videoId = article.youtubeUrl.split('youtu.be/')[1].split('?')[0];
-      }
-      
-      if (videoId) {
-        const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
-        window.open(watchUrl, '_blank', 'noopener,noreferrer');
-      }
-    } catch (error) {
-      console.error('Error processing URL:', error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-orange-500 mx-auto"></div>
-          <p className="text-white mt-4">Loading article...</p>
-        </div>
-      </div>
-    );
+  if (isNaN(articleId)) {
+    notFound();
   }
+
+  const article = await prisma.newsArticle.findUnique({
+    where: { id: articleId },
+    include: { author: { select: { name: true } } },
+  });
 
   if (!article) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">Article Not Found</h1>
-          <button
-            onClick={() => router.push('/')}
-            className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 transition-all"
-          >
-            ← Back to Home
-          </button>
-        </div>
-      </div>
-    );
+    notFound();
   }
 
+  const summaryPoints = JSON.parse(article.summaryPoints);
+  const tags = article.tags ? JSON.parse(article.tags) : [];
+
+  // Get related articles (same category)
+  const related = await prisma.newsArticle.findMany({
+    where: {
+      category: article.category,
+      id: { not: article.id },
+      published: true,
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 3,
+  });
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
-        <button
-          onClick={() => router.push('/')}
-          className="mb-6 flex items-center text-orange-400 hover:text-orange-300 transition-colors"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to News
-        </button>
-
-        {/* Article Container */}
-        <article className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border border-gray-700/50">
-          {/* Header */}
-          <div className="p-8">
-            <div className="flex items-center mb-4">
-              <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-500/20 to-green-600/20 text-orange-300 border border-orange-500/40">
-                #{article.id}
-              </span>
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-orange-400 via-white to-green-500 bg-clip-text text-transparent leading-tight">
-              {article.title}
-            </h1>
-
-            {/* YouTube Video */}
-            <div 
-              className="mb-8 relative h-64 md:h-96 w-full rounded-xl overflow-hidden group cursor-pointer"
-              onClick={handleVideoClick}
-            >
-              <img
-                src={getYouTubeThumbnail(article.youtubeUrl)}
-                alt={article.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  if (target.src.includes('maxresdefault')) {
-                    target.src = target.src.replace('maxresdefault', 'hqdefault');
-                  }
-                }}
-              />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all"></div>
-              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent"></div>
-              
-              {/* Center play button */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 bg-red-600/90 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-red-700 transition-all">
-                  <svg className="w-10 h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                </div>
-              </div>
-
-              {/* Bottom right button */}
-              <div className="absolute bottom-6 right-6">
-                <span className="inline-flex items-center px-4 py-2 bg-red-600/90 text-white rounded-full group-hover:bg-red-700 transition-all">
-                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                  Watch Full Video
-                </span>
-              </div>
-            </div>
-
-            {/* Key Summary Points */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-orange-400 mb-4 flex items-center">
-                <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                </svg>
-                Key Points
-              </h2>
-              <div className="space-y-4">
-                {article.summaryPoints.map((point, index) => (
-                  <div key={index} className="flex items-start bg-gray-800/50 p-4 rounded-lg border border-gray-700/30">
-                    <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-gradient-to-br from-orange-500 to-orange-600 text-white font-bold rounded-full mr-4">
-                      {index + 1}
-                    </span>
-                    <p className="text-gray-200 leading-relaxed font-medium flex-1">{point}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Full Content */}
-            {article.fullContent && (
-              <div>
-                <h2 className="text-2xl font-bold text-orange-400 mb-4 flex items-center">
-                  <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Comprehensive Analysis
-                </h2>
-                <div className="prose prose-invert prose-lg max-w-none">
-                  <div className="text-gray-300 leading-relaxed space-y-4">
-                    {article.fullContent.split('\n\n').map((paragraph, index) => (
-                      <p key={index} className="text-base md:text-lg">{paragraph}</p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </article>
-
-        {/* Back to News Button */}
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => router.push('/')}
-            className="px-8 py-4 bg-gradient-to-r from-orange-500 to-green-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+      {/* Navigation */}
+      <nav className="bg-gray-900/80 backdrop-blur-sm border-b border-gray-700/50 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <Link
+            href="/"
+            className="text-xl font-bold bg-gradient-to-r from-[#FF9933] via-white to-[#138808] bg-clip-text text-transparent"
           >
-            ← Back to All News
-          </button>
+            Unbiased Hindustani.ai
+          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="text-gray-400 hover:text-orange-400 transition text-sm font-medium"
+            >
+              ← Back to News
+            </Link>
+            <Link
+              href="/trending"
+              className="text-gray-400 hover:text-orange-400 transition text-sm font-medium"
+            >
+              📈 Trending
+            </Link>
+          </div>
         </div>
-      </div>
+      </nav>
+
+      <main className="container mx-auto px-4 py-12 max-w-4xl">
+        {/* Category & Meta */}
+        <div className="flex items-center gap-3 mb-6 flex-wrap">
+          <span className="px-4 py-1.5 bg-orange-500/20 text-orange-300 rounded-full text-sm font-medium border border-orange-500/30">
+            {categoryIcons[article.category] || '📰'} {article.category}
+          </span>
+          {article.source && (
+            <span className="px-3 py-1 bg-purple-500/15 text-purple-300 rounded-full text-xs border border-purple-500/20">
+              🤖 {article.source}
+            </span>
+          )}
+          <span className="text-sm text-gray-500">
+            {formatDate(article.createdAt)}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h1 className="text-3xl lg:text-5xl font-bold text-white mb-8 leading-tight">
+          {article.title}
+        </h1>
+
+        {/* Author */}
+        {article.author?.name && (
+          <p className="text-gray-400 mb-8">
+            By{' '}
+            <span className="text-orange-300 font-medium">
+              {article.author.name}
+            </span>
+          </p>
+        )}
+
+        {/* YouTube Embed — only for articles sourced from YouTube, not AI-generated */}
+        {article.youtubeUrl && article.source !== 'AI Generated' && article.source !== 'Search Generated' && (
+          <div className="mb-10">
+            <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-gray-700/50">
+              <iframe
+                src={`https://www.youtube.com/embed/${extractVideoId(article.youtubeUrl)}`}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Key Points */}
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold text-white mb-5 flex items-center gap-2">
+            <span className="text-orange-400">▎</span> Key Points
+          </h2>
+          <div className="bg-gradient-to-br from-orange-500/10 to-green-500/5 rounded-2xl p-6 border border-orange-500/20">
+            <ul className="space-y-3">
+              {summaryPoints.map((point: string, idx: number) => (
+                <li
+                  key={idx}
+                  className="flex items-start gap-3 text-gray-200"
+                >
+                  <span className="flex-shrink-0 w-7 h-7 flex items-center justify-center bg-gradient-to-br from-orange-500 to-orange-600 text-white text-sm font-bold rounded-full">
+                    {idx + 1}
+                  </span>
+                  <span className="leading-relaxed">{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        {/* Full Content */}
+        {article.fullContent && (
+          <section className="mb-10">
+            <h2 className="text-2xl font-bold text-white mb-5 flex items-center gap-2">
+              <span className="text-green-400">▎</span> Full Analysis
+            </h2>
+            <div className="prose prose-invert prose-lg max-w-none">
+              {renderFullContent(article.fullContent)}
+            </div>
+          </section>
+        )}
+
+        {/* Tags */}
+        {tags.length > 0 && (
+          <div className="mb-10">
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag: string, idx: number) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1.5 bg-gray-800/80 text-gray-400 rounded-full text-sm border border-gray-700 hover:border-orange-500/30 hover:text-orange-300 transition cursor-default"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* AI Fact-Check */}
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold text-white mb-5 flex items-center gap-2">
+            <span className="text-blue-400">▎</span> Verify This News
+          </h2>
+          <FactCheckButton articleId={article.id} />
+        </section>
+
+        {/* Related Articles */}
+        {related.length > 0 && (
+          <section className="mt-16 pt-10 border-t border-gray-700/50">
+            <h2 className="text-2xl font-bold text-white mb-6">
+              More in {article.category}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {related.map((rel) => {
+                const relPoints = JSON.parse(rel.summaryPoints);
+                return (
+                  <Link
+                    key={rel.id}
+                    href={`/article/${rel.id}`}
+                    className="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50 hover:border-orange-500/30 transition group"
+                  >
+                    <h3 className="text-sm font-bold text-white mb-2 group-hover:text-orange-300 transition line-clamp-2">
+                      {rel.title}
+                    </h3>
+                    <p className="text-xs text-gray-400 line-clamp-2">
+                      {relPoints[0]}
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gradient-to-b from-gray-900 to-black border-t border-gray-800 py-8 mt-12">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-500">
+            © 2025 Unbiased Hindustani.ai — AI-powered unbiased news
+          </p>
+        </div>
+      </footer>
     </div>
   );
+}
+
+// Render full content with support for ## markdown headers
+function renderFullContent(content: string) {
+  const blocks = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let currentParagraph: string[] = [];
+  let key = 0;
+
+  const flushParagraph = () => {
+    if (currentParagraph.length > 0) {
+      const text = currentParagraph.join('\n').trim();
+      if (text) {
+        elements.push(
+          <p key={key++} className="text-gray-300 leading-relaxed text-base mb-4">
+            {text}
+          </p>
+        );
+      }
+      currentParagraph = [];
+    }
+  };
+
+  for (const line of blocks) {
+    if (line.startsWith('## ')) {
+      flushParagraph();
+      elements.push(
+        <h3
+          key={key++}
+          className="text-xl font-bold text-white mt-6 mb-3 flex items-center gap-2"
+        >
+          <span className="text-orange-400">▸</span>
+          {line.replace('## ', '')}
+        </h3>
+      );
+    } else if (line.startsWith('### ')) {
+      flushParagraph();
+      elements.push(
+        <h4
+          key={key++}
+          className="text-lg font-semibold text-white/90 mt-4 mb-2"
+        >
+          {line.replace('### ', '')}
+        </h4>
+      );
+    } else if (line.trim() === '') {
+      flushParagraph();
+    } else {
+      currentParagraph.push(line);
+    }
+  }
+
+  flushParagraph();
+  return <>{elements}</>;
+}
+
+function extractVideoId(url: string): string {
+  try {
+    if (url.includes('/embed/')) return url.split('/embed/')[1].split('?')[0];
+    if (url.includes('watch?v='))
+      return new URL(url).searchParams.get('v') || '';
+    if (url.includes('youtu.be/'))
+      return url.split('youtu.be/')[1].split('?')[0];
+  } catch {
+    // ignore
+  }
+  return '';
 }

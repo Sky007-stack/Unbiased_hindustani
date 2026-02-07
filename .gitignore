@@ -33,6 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# database
+prisma/dev.db
+prisma/dev.db-journal
+
 # vercel
 .vercel
 
@@ -48,3 +52,5 @@ backend/app/__pycache__/
 *.pyo
 *.pyd
 __pycache__/
+
+/src/generated/prisma

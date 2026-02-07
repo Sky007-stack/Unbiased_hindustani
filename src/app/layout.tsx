@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import AuthProvider from "@/components/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,7 +15,13 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Unbiased Hindustani - Your Source for Balanced Political News",
-  description: "Get balanced and unbiased coverage of Indian politics and current affairs",
+  description: "Get balanced and unbiased coverage of Indian politics and current affairs. AI-powered news analysis across politics, technology, sports, entertainment, and more.",
+  keywords: ["Indian news", "unbiased news", "political news India", "AI news", "trending topics India"],
+  openGraph: {
+    title: "Unbiased Hindustani.ai",
+    description: "Know what India knows — instantly. AI-powered balanced political coverage.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -27,11 +34,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
-        <div className="relative z-10 backdrop-blur-sm bg-white/60">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {children}
-          </div>
-        </div>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
