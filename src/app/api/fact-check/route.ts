@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// POST /api/fact-check — AI-powered fact checking for an article
+// POST /api/fact-check — AI-powered fact checking with DB caching
 export async function POST(request: NextRequest) {
   const googleKey = process.env.GOOGLE_AI_API_KEY || process.env.GEMINI_API_KEY;
 
@@ -33,67 +33,46 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // CHECK CACHE FIRST — return instantly if already fact-checked
+    if (article.factCheckCache && article.factCheckedAt) {
+      const cached = JSON.parse(article.factCheckCache);
+      return NextResponse.json({
+        success: true,
+        articleId: article.id,
+        articleTitle: article.title,
+        factCheck: cached,
+        cached: true,
+      });
+    }
+
     const summaryPoints = JSON.parse(article.summaryPoints);
 
-    const prompt = `You are an expert fact-checker and journalist working for a credible Indian news verification agency. Your job is to rigorously fact-check news articles.
+    const prompt = `Fact-check this Indian news article concisely.
 
-ARTICLE TO FACT-CHECK:
 Title: "${article.title}"
 Category: ${article.category}
-Key Claims:
-${summaryPoints.map((p: string, i: number) => `${i + 1}. ${p}`).join('\n')}
+Claims:
+${summaryPoints.slice(0, 4).map((p: string, i: number) => `${i + 1}. ${p}`).join('\n')}
 
-Full Content:
-${article.fullContent || 'Not available'}
-
-INSTRUCTIONS:
-Analyze each claim in the article and verify it against known facts. For each major claim:
-1. Identify the specific claim
-2. Assess whether it is TRUE, PARTIALLY TRUE, MISLEADING, UNVERIFIED, or FALSE
-3. Provide a brief explanation of your verification
-4. Cite what credible sources would confirm or deny this claim
-
-Then provide an overall assessment.
-
-Return your response as a JSON object:
+Return JSON:
 {
-  "overallVerdict": "TRUE" | "MOSTLY TRUE" | "PARTIALLY TRUE" | "MISLEADING" | "MOSTLY FALSE" | "FALSE" | "UNVERIFIED",
-  "truthPercentage": <number 0-100>,
-  "overallSummary": "<2-3 sentence summary of the fact-check>",
-  "claimVerifications": [
-    {
-      "claim": "<the specific claim being checked>",
-      "verdict": "TRUE" | "PARTIALLY TRUE" | "MISLEADING" | "UNVERIFIED" | "FALSE",
-      "explanation": "<1-2 sentence explanation>",
-      "sources": ["<source name 1>", "<source name 2>"]
-    }
-  ],
-  "sources": [
-    {
-      "name": "<source name>",
-      "type": "Government Data" | "News Outlet" | "Research Paper" | "Official Statement" | "Expert Analysis" | "Public Records",
-      "reliability": "High" | "Medium" | "Low"
-    }
-  ],
-  "redFlags": ["<any red flags or concerns about the article>"],
-  "context": "<additional context that helps understand the claims better>"
+  "overallVerdict": "TRUE|MOSTLY TRUE|PARTIALLY TRUE|MISLEADING|MOSTLY FALSE|FALSE|UNVERIFIED",
+  "truthPercentage": <0-100>,
+  "overallSummary": "<1 sentence>",
+  "claimVerifications": [{"claim": "<claim>", "verdict": "TRUE|FALSE|UNVERIFIED|PARTIALLY TRUE|MISLEADING", "explanation": "<1 sentence>", "sources": ["<source>"]}],
+  "sources": [{"name": "<source>", "type": "Government Data|News Outlet|Research Paper|Official Statement|Expert Analysis", "reliability": "High|Medium|Low"}],
+  "redFlags": ["<concern>"],
+  "context": "<1 sentence>"
 }
 
-IMPORTANT RULES:
-- Be rigorous and honest in your assessment
-- If claims are about future events or predictions, mark them as "UNVERIFIED" 
-- If claims are broadly accurate but lack specific verifiable details, mark as "PARTIALLY TRUE"
-- Always cite realistic, credible Indian and international sources (e.g., PIB, RBI, SEBI, PTI, Reuters, WHO, NASSCOM, etc.)
-- For AI-generated articles, note that the content is AI-generated and facts should be independently verified
-- Do NOT fabricate specific URLs — just cite source organization names
-- Be balanced and fair in your assessment`;
+Rules: Be honest. Mark AI-generated content as UNVERIFIED. Cite real Indian sources (PIB, RBI, PTI, Reuters etc). Be concise.`;
 
-    // Try multiple models with retry for rate limits
+    // Use fastest models first
     const models = [
-      { name: 'gemini-2.5-flash', version: 'v1' },
+      { name: 'gemini-2.0-flash-lite', version: 'v1' },
       { name: 'gemini-2.0-flash', version: 'v1' },
       { name: 'gemini-2.5-flash-lite', version: 'v1' },
-      { name: 'gemini-2.0-flash-lite', version: 'v1' },
+      { name: 'gemini-2.5-flash', version: 'v1' },
     ];
     let lastError = '';
 
@@ -106,8 +85,8 @@ IMPORTANT RULES:
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 8192,
+            temperature: 0.2,
+            maxOutputTokens: 2048,
           },
         }),
       });
@@ -116,21 +95,29 @@ IMPORTANT RULES:
         const data = await response.json();
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-        // Parse JSON from response
         const jsonMatch =
           text.match(/```json\n?([\s\S]*?)\n?```/) || text.match(/\{[\s\S]*\}/);
         const jsonText = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : text;
         const factCheckResult = JSON.parse(jsonText);
+
+        // CACHE the result in DB for instant future lookups
+        await prisma.newsArticle.update({
+          where: { id: article.id },
+          data: {
+            factCheckCache: JSON.stringify(factCheckResult),
+            factCheckedAt: new Date(),
+          },
+        }).catch(err => console.warn('Cache save failed:', err));
 
         return NextResponse.json({
           success: true,
           articleId: article.id,
           articleTitle: article.title,
           factCheck: factCheckResult,
+          cached: false,
         });
       }
 
-      // If rate limited (429), try next model
       const errText = await response.text();
       lastError = errText;
       console.warn(`Model ${model.name} failed (${response.status}), trying next...`);

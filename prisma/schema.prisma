@@ -64,20 +64,22 @@ model User {
 
 // ─── News Article Model ───────────────────────────────────
 model NewsArticle {
-  id            Int      @id @default(autoincrement())
-  title         String
-  summaryPoints String   @db.Text // JSON array stored as string
-  fullContent   String?  @db.Text
-  youtubeUrl    String?  // Optional — AI-generated articles may not have YouTube
-  imageUrl      String?  // Optional thumbnail/image URL
-  category      String   @default("Politics")
-  tags          String?  @db.Text // JSON array stored as string
-  published     Boolean  @default(true)
-  source        String   @default("AI Generated") // "AI Generated", "YouTube", "Search", etc.
-  authorId      String?
-  author        User?    @relation("AuthorArticles", fields: [authorId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              Int       @id @default(autoincrement())
+  title           String
+  summaryPoints   String    @db.Text // JSON array stored as string
+  fullContent     String?   @db.Text
+  youtubeUrl      String?   // Optional — AI-generated articles may not have YouTube
+  imageUrl        String?   // Optional thumbnail/image URL
+  category        String    @default("Politics")
+  tags            String?   @db.Text // JSON array stored as string
+  published       Boolean   @default(true)
+  source          String    @default("AI Generated") // "AI Generated", "YouTube", "Search", etc.
+  factCheckCache  String?   @db.Text // Cached fact-check result JSON
+  factCheckedAt   DateTime? // When fact-check was last run
+  authorId        String?
+  author          User?     @relation("AuthorArticles", fields: [authorId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }
 
 // ─── Trending Topic Model ─────────────────────────────────

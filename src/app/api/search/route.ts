@@ -98,10 +98,10 @@ Rules:
 
     // Try multiple models with fallback for rate limits
     const models = [
-      { name: 'gemini-2.5-flash', version: 'v1' },
+      { name: 'gemini-2.0-flash-lite', version: 'v1' },
       { name: 'gemini-2.0-flash', version: 'v1' },
       { name: 'gemini-2.5-flash-lite', version: 'v1' },
-      { name: 'gemini-2.0-flash-lite', version: 'v1' },
+      { name: 'gemini-2.5-flash', version: 'v1' },
     ];
     let aiText = '';
     let aiSuccess = false;
