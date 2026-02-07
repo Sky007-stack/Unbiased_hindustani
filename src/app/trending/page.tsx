@@ -94,7 +94,17 @@ export default function TrendingPage() {
     setLoadingTopicId(topic.id);
     setTopicError(null);
     try {
-      // Search for existing article or generate one via search API
+      // First, quick DB-only search (no AI generation) by checking existing articles
+      const quickRes = await fetch(`/api/articles?q=${encodeURIComponent(topic.title)}&limit=1`);
+      if (quickRes.ok) {
+        const quickData = await quickRes.json();
+        if (quickData.articles && quickData.articles.length > 0) {
+          router.push(`/article/${quickData.articles[0].id}`);
+          return;
+        }
+      }
+
+      // No existing article — generate via search API
       const res = await fetch(`/api/search?q=${encodeURIComponent(topic.title)}`);
       const data = await res.json();
 

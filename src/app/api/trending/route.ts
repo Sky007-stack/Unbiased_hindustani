@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Cache trending data for 5 minutes
+export const revalidate = 300;
+
 // GET /api/trending — fetch trending topics
 export async function GET(request: NextRequest) {
   try {

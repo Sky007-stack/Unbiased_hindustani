@@ -71,13 +71,13 @@ export async function GET(request: NextRequest) {
 
     const prompt = `You are an expert Indian news journalist for "Unbiased Hindustani.ai". A user searched for: "${query}"
 
-Generate 3 detailed, factual, unbiased news articles related to this search topic in the Indian context.
+Generate 1 detailed, factual, unbiased news article related to this search topic in the Indian context.
 
-For EACH article, provide:
+For the article, provide:
 - title: A professional, unique news headline (8-15 words)
 - category: One of [Politics, Technology, Business, Sports, Entertainment, Science, Education, Health, World, Environment]
-- summaryPoints: An array of 6-8 concise bullet points (each 10-20 words)
-- fullContent: A VERY detailed 500-800 word article structured with "## Section Title" markdown headers. Cover: background, current developments, stakeholder positions, data, expert analysis, public impact, and future outlook. Make it comprehensive — readers want real depth.
+- summaryPoints: An array of 5-6 concise bullet points (each 10-20 words)
+- fullContent: A detailed 300-500 word article structured with "## Section Title" markdown headers. Cover: background, current developments, expert analysis, and future outlook.
 - tags: An array of 4-6 relevant keywords
 
 Return as a JSON array:
@@ -90,13 +90,10 @@ Return as a JSON array:
 }]
 
 Rules:
-- Each article must have a UNIQUE title covering a different angle of the search topic
 - Focus on REAL, current events and facts related to the search query
 - Be factual and unbiased — present all sides
 - Use Indian English conventions
-- For political topics, present balanced perspectives
 - Use ## headers to structure fullContent into readable sections
-- Write AT LEAST 500 words for fullContent
 - Do NOT fabricate specific statistics or quotes`;
 
     // Try multiple models with fallback for rate limits
@@ -119,7 +116,7 @@ Rules:
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 16384,
+            maxOutputTokens: 4096,
           },
         }),
       });

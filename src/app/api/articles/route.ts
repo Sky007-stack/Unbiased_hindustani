@@ -15,6 +15,15 @@ export async function GET(request: NextRequest) {
       where.category = category;
     }
 
+    // Quick search by title keyword (DB-only, no AI)
+    const q = searchParams.get('q')?.trim();
+    if (q) {
+      where.OR = [
+        { title: { contains: q, mode: 'insensitive' } },
+        { category: { contains: q, mode: 'insensitive' } },
+      ];
+    }
+
     const [articles, total] = await Promise.all([
       prisma.newsArticle.findMany({
         where,
