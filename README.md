@@ -1,306 +1,254 @@
-# Unbiased Hindustani.ai# Unbiased Hindustani
+# 🇮🇳 Unbiased Hindustani — AI-Powered News Platform
 
+An AI-powered, unbiased Indian news platform that auto-generates factual news articles, verifies claims with AI fact-checking, and tracks trending topics across 10 categories — all deployed as a production-grade system.
 
-
-**Your Source for Balanced Political News****Your Source for Balanced Political News**
-
-
-
-A modern news website built with Next.js, featuring AI-powered content generation from YouTube videos with comprehensive analysis and an Indian flag-themed design.A modern news website built with Next.js, featuring AI-powered content generation and YouTube video integration with an Indian flag-themed design.
-
-
-
-## ✨ Features## ✨ Features
-
-
-
-- 🇮🇳 **Indian Flag Theme** - Beautiful dark theme with saffron, white, and green accent colors- 🇮🇳 **Indian Flag Theme** - Beautiful gradient design with saffron, white, and green colors
-
-- 🤖 **AI-Powered News Generation** - Auto-generate news with title, 5 key points, and 15-20 line comprehensive brief using Google Gemini AI- 🤖 **AI-Powered** - Auto-generate news summaries using Google Gemini AI
-
-- 📺 **YouTube Integration** - Automatic transcript extraction, thumbnail fetching, and video embedding- 📺 **YouTube Integration** - Automatic thumbnail fetching and video embedding
-
-- 📝 **Admin Panel** - Easy-to-use interface for managing news content with AI auto-generation- 📝 **Admin Panel** - Easy-to-use interface for managing news content
-
-- 📱 **Responsive Design** - Works seamlessly on all devices- 📱 **Responsive Design** - Works seamlessly on all devices
-
-- 🌙 **Dark Theme** - Modern dark interface inspired by DeepJudge.ai- 🌙 **Dark Theme** - Modern dark interface with excellent readability
-
-- 📖 **Dedicated Article Pages** - Full article view with comprehensive analysis- ⚡ **Real-time Updates** - localStorage-based data management
-
-- ⚡ **Real-time Updates** - localStorage-based data management with JSON fallback
-
-## 🚀 Getting Started
-
-## 🚀 Quick Start for Your Friend
-
-First, install dependencies:
-
-### Prerequisites
-
-- Node.js 18+ installed```bash
-
-- Git installednpm run dev
-
-- Google Gemini API key (free)# or
-
-yarn dev
-
-### Step 1: Clone the Repository# or
-
-pnpm dev
-
-```bash# or
-
-git clone https://github.com/Shivams210/Unbiased_hindustani.gitbun dev
-
-cd Unbiased_hindustani/unbiased_hindustani```
-
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-### Step 2: Install Dependencies
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-```bash
-
-npm installThis project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-```
-
-## 🚀 Getting Started
-
-### Step 3: Configure Environment Variables
-
-First, install dependencies:
-
-Create a `.env.local` file in the root directory:
-
-```bash
-
-```envnpm install
-
-# Google Gemini AI API Key (Get free key from: https://aistudio.google.com/app/apikey)```
-
-GEMINI_API_KEY=your_gemini_api_key_here
-
-Then, run the development server:
-
-# Alternative (both work):
-
-GOOGLE_AI_API_KEY=your_gemini_api_key_here```bash
-
-```npm run dev
-
-```
-
-**How to get free Gemini API Key:**
-
-1. Visit: https://aistudio.google.com/app/apikeyOpen [http://localhost:3000](http://localhost:3000) with your browser to see the website.
-
-2. Sign in with Google account
-
-3. Click "Create API Key"## 🔑 API Configuration
-
-4. Copy and paste into `.env.local`
-
-Create a `.env.local` file in the root directory:
-
-### Step 4: Run the Development Server
-
-```env
-
-```bashGOOGLE_AI_API_KEY=your_google_ai_api_key_here
-
-npm run dev```
-
-```
-
-Get your free API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 📂 Project Structure
-
-### Step 5: Access Admin Panel
-
-```
-
-Navigate to [http://localhost:3000/admin-panel.html](http://localhost:3000/admin-panel.html)├── src/
-
-│   ├── app/              # Next.js app directory
-
-## 📖 How to Use│   │   ├── page.tsx      # Homepage
-
-│   │   └── api/          # API routes
-
-### Adding News via Admin Panel│   └── components/       # React components
-
-├── public/
-
-1. **Open Admin Panel:** `http://localhost:3000/admin-panel.html`│   ├── admin-panel.html  # Admin interface
-
-│   └── admin-news.json   # News data storage
-
-2. **Auto-Generate News (Recommended):**└── backend/              # Python backend (optional)
-
-   - Paste any YouTube political video URL```
-
-   - Click "Generate with AI 🤖" button
-
-   - AI will automatically create:## 🛠️ Tech Stack
-
-     - ✅ Catchy news title (10-12 words)
-
-     - ✅ 5 concise summary points- **Framework:** Next.js 15.5.6
-
-     - ✅ Comprehensive 15-20 line brief- **Language:** TypeScript
-
-   - Click "Add News (Auto Save)" to publish- **Styling:** TailwindCSS
-
-- **AI:** Google Gemini AI
-
-3. **Manual Entry:**- **Video:** YouTube API & Transcript API
-
-   - Fill in all fields manually
-
-   - Click "Add News (Auto Save)" to publish## 📝 Usage
-
-
-
-### Viewing News### Adding News
-
-1. Navigate to `/admin-panel.html`
-
-- **Homepage:** See all news cards with 5 key points and video thumbnails2. Enter YouTube video URL
-
-- **Read Full Article:** Click the orange button to view complete analysis3. Click "Auto Generate with AI"
-
-- **Watch Video:** Click on video thumbnail or "Watch Video" button4. Review and publish
-
-
-
-## 📂 Project Structure### Features
-
-- **Auto-Generate:** AI creates title, summary, and key points
-
-```- **Dual Technology:** Transcript-based or metadata-based generation
-
-unbiased_hindustani/- **Expandable Content:** "Read More" sections for detailed information
-
-├── src/
-
-│   ├── app/## 🤝 Contributing
-
-│   │   ├── page.tsx              # Homepage with news grid
-
-│   │   ├── layout.tsx            # Root layoutContributions are welcome! Feel free to open issues or submit pull requests.
-
-│   │   ├── globals.css           # Global styles
-
-│   │   ├── article/## 📄 License
-
-│   │   │   └── [id]/
-
-│   │   │       └── page.tsx      # Individual article pageThis project is open source and available under the MIT License.
-
-│   │   └── api/
-
-│   │       ├── news/             # News API route---
-
-│   │       └── generate-summary/ # AI generation API
-
-│   │           └── route.ts      Made with ❤️ for unbiased news reporting
-
-│   └── components/
-│       └── NewsCard.tsx          # News card component
-├── public/
-│   ├── admin-panel.html          # Admin interface
-│   ├── admin-news.json           # News data storage
-│   └── leaders/
-│       └── default.jpg           # Fallback thumbnail
-├── .env.local                    # Environment variables (create this)
-├── package.json                  # Dependencies
-└── README.md                     # This file
-```
-
-## 🛠️ Tech Stack
-
-- **Framework:** Next.js 15.5.6 (App Router)
-- **Language:** TypeScript
-- **Styling:** TailwindCSS
-- **AI Model:** Google Gemini 2.5 Flash Lite
-- **Video APIs:** 
-  - YouTube Transcript API (youtube-transcript)
-  - YouTube oEmbed API (metadata fallback)
-- **Deployment:** Vercel-ready
-
-## 🔑 Key Technologies
-
-### AI Integration
-- Uses Google Gemini AI (gemini-2.5-flash-lite model)
-- Direct REST API calls for reliability
-- Token-optimized prompts (15-20 line briefs)
-- Handles both transcript-based and metadata-based generation
-
-### Data Management
-- Primary: Browser localStorage
-- Fallback: JSON file (admin-news.json)
-- Auto-save functionality in admin panel
-
-## 🌐 Deployment to Vercel
-
-1. Push your code to GitHub
-2. Import project in Vercel
-3. Add environment variable:
-   - Key: `GEMINI_API_KEY`
-   - Value: Your Google Gemini API key
-4. Deploy!
-
-Your site will be live at: `https://your-project.vercel.app`
-
-## 📝 API Endpoints
-
-- `POST /api/generate-summary` - Generate news from YouTube URL
-  - Body: `{ "youtubeUrl": "https://youtube.com/..." }`
-  - Response: `{ "title": "...", "summaryPoints": [...], "fullContent": "..." }`
-
-- `GET /api/news` - Fetch all news items
-
-## 🐛 Troubleshooting
-
-### Issue: "Article Not Found"
-- **Solution:** Add news via admin panel first. The homepage needs data to display.
-
-### Issue: AI Generation Fails
-- **Solution:** 
-  1. Check `.env.local` has correct API key
-  2. Verify API key is active at https://aistudio.google.com
-  3. Restart dev server: `npm run dev`
-
-### Issue: Video Transcript Not Available
-- **Solution:** AI will automatically use video metadata (title/description) instead. Works for ~60% of videos.
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest features
-- Submit pull requests
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
-## 🔗 Links
-
-- **GitHub:** https://github.com/Shivams210/Unbiased_hindustani
-- **Live Demo:** https://unbiased-hindustani.vercel.app (if deployed)
+**🔗 Live:** [https://unbiased-hindustani-xi.vercel.app](https://unbiased-hindustani-xi.vercel.app)
 
 ---
 
-Made with ❤️ for unbiased news reporting
+## 🛠️ Tech Stack
 
-**Current Version:** 1.0.0 | **Last Updated:** October 23, 2025
+| Layer | Technology |
+|-------|-----------|
+| **Framework** | Next.js 16.1.6 (TypeScript, App Router) |
+| **Styling** | TailwindCSS (dark theme) |
+| **Database** | Neon PostgreSQL (serverless, free tier) |
+| **ORM** | Prisma 5.22.0 |
+| **AI** | Google Gemini API (2.0-flash-lite / 2.0-flash / 2.5-flash) |
+| **Auth** | NextAuth.js v4 (JWT + credentials) |
+| **Hosting** | Vercel (free tier, auto-deploy on push) |
+| **Repository** | [GitHub](https://github.com/Sky007-stack/Unbiased_hindustani) |
+
+---
+
+## ✨ Features
+
+### 1. 🤖 AI-Powered News Generation
+- Auto-generates detailed news articles from trending topics using Google Gemini AI
+- 300–500 word structured articles with markdown section headers
+- Covers **10 categories**: Politics, Technology, Business, Sports, Entertainment, Science, Education, Health, World, Environment
+- Articles saved to PostgreSQL for instant future access
+
+### 2. 🔍 AI Search & Article Generation
+- Search bar on homepage searches existing database articles first
+- If fewer than 3 results found, automatically generates a new AI article matching the query
+- Generated articles are persisted in the database so repeat searches are instant
+
+### 3. 📈 Trending Topics (100 Topics, 10 Per Genre)
+- 100 trending topics seeded across 10 categories
+- Grouped view by category with color-coded cards and emoji icons
+- Category filter tabs to browse by genre
+- Trend score bars (🔥 Hot / 📈 Rising / ⚡ Active / 📊 Moderate)
+- AI refresh button to fetch fresh trending topics from Gemini
+- **Clickable cards** — click any topic to read a full article
+
+### 4. ✅ AI Fact-Check System
+- **"Verify This News"** button on every article page
+- Analyzes article claims against known facts via Gemini AI
+- Returns:
+  - Overall verdict (TRUE → FALSE scale)
+  - Truth percentage with color-coded bar
+  - Claim-by-claim analysis with individual verdicts
+  - Sources with reliability ratings (High / Medium / Low)
+  - Red flags and additional context
+- **Results cached in database** — second click is instant (< 1 second)
+
+### 5. 🔐 Authentication System
+- NextAuth.js v4 with credentials provider
+- JWT-based sessions with role support (admin / editor / user)
+- Login page with email/password
+- Registration endpoint (`/api/auth/register`)
+
+### 6. 🛡️ Admin Panel
+- Protected admin page at `/admin`
+- Article management interface
+- Default admin credentials:
+  - **Email:** `admin@unbiasedhindustani.ai`
+  - **Password:** `admin123`
+
+### 7. 📄 Article Detail Pages (SSR)
+- Server-side rendered article pages
+- Full content with markdown rendering
+- Summary bullet points and category tags
+- Related articles section
+- Integrated AI fact-check button
+
+### 8. 🏠 Homepage (ISR)
+- Server-side rendered with Incremental Static Regeneration (revalidates every 60 seconds)
+- Latest 20 articles displayed
+- Category filter and search bar integrated
+- Auto news feed component
+
+---
+
+## ⚡ Performance Optimizations
+
+| Optimization | Detail |
+|---|---|
+| **Fact-check DB caching** | First check ~5s, every repeat **< 1 second** |
+| **DB-first trending lookup** | Checks existing articles before calling AI |
+| **Fastest AI model priority** | `gemini-2.0-flash-lite` first, fallback to heavier models |
+| **4-model fallback chain** | `2.0-flash-lite` → `2.0-flash` → `2.5-flash-lite` → `2.5-flash` |
+| **Shorter prompts** | Fact-check prompt cut from ~500 words to ~100 words |
+| **Reduced token limits** | Fact-check: 2,048 tokens · Search: 4,096 tokens |
+| **Single article generation** | Search generates 1 article (was 3) for 3× faster response |
+| **Vercel region `iad1`** | Deployed in US East, same region as Neon DB |
+| **Trending API cached 5 min** | `revalidate = 300` on trending endpoint |
+| **Homepage ISR 60s** | Fresh content without full rebuilds |
+| **Prisma singleton pattern** | Prevents connection pool exhaustion in serverless |
+
+---
+
+## 📂 Project Structure
+
+```
+├── prisma/
+│   ├── schema.prisma              # Database schema (PostgreSQL)
+│   ├── seed.js                    # Seeds 100 topics, 3 articles, admin user
+│   └── migrations/                # Migration history
+├── src/
+│   ├── app/
+│   │   ├── page.tsx               # Homepage (ISR)
+│   │   ├── layout.tsx             # Root layout with dark theme
+│   │   ├── globals.css            # TailwindCSS styles
+│   │   ├── admin/page.tsx         # Admin panel
+│   │   ├── login/page.tsx         # Login page
+│   │   ├── trending/page.tsx      # Trending topics page
+│   │   ├── article/[id]/page.tsx  # Article detail (SSR)
+│   │   └── api/
+│   │       ├── articles/route.ts       # CRUD articles + DB search
+│   │       ├── search/route.ts         # Search + AI generation
+│   │       ├── trending/route.ts       # Trending topics + AI refresh
+│   │       ├── fact-check/route.ts     # AI fact-checking + caching
+│   │       ├── auto-generate/route.ts  # Bulk article generation
+│   │       ├── news/route.ts           # News feed
+│   │       └── auth/
+│   │           ├── [...nextauth]/route.ts  # NextAuth handler
+│   │           └── register/route.ts       # User registration
+│   ├── components/
+│   │   ├── AuthProvider.tsx       # NextAuth session provider
+│   │   ├── AutoNewsFeed.tsx       # Auto-refreshing news feed
+│   │   ├── FactCheckButton.tsx    # AI fact-check UI component
+│   │   ├── NewsCard.tsx           # Article card component
+│   │   └── SearchBar.tsx          # Search bar component
+│   ├── lib/
+│   │   ├── auth.ts                # NextAuth configuration
+│   │   └── prisma.ts              # Prisma client singleton
+│   └── types/
+│       └── next-auth.d.ts         # NextAuth type extensions
+├── vercel.json                    # Vercel deployment config
+├── DEPLOY.md                      # Step-by-step deployment guide
+├── .env.example                   # Environment variable template
+└── package.json
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Node.js 18+**
+- A [Neon](https://neon.tech) PostgreSQL database (free)
+- A [Google Gemini API key](https://aistudio.google.com/app/apikey) (free)
+
+### Local Development
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/Sky007-stack/Unbiased_hindustani.git
+cd Unbiased_hindustani
+
+# 2. Install dependencies
+npm install
+
+# 3. Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your Neon connection string and Gemini API key
+
+# 4. Push schema to database
+npx prisma db push
+
+# 5. Generate Prisma client
+npx prisma generate
+
+# 6. Seed the database
+node prisma/seed.js
+
+# 7. Start dev server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | Neon PostgreSQL pooled connection string |
+| `DIRECT_URL` | Neon PostgreSQL direct connection string |
+| `GEMINI_API_KEY` | Google Gemini API key |
+| `GOOGLE_AI_API_KEY` | Same as `GEMINI_API_KEY` (alias) |
+| `NEXTAUTH_SECRET` | Random secret for JWT signing |
+| `NEXTAUTH_URL` | App URL (`http://localhost:3000` for dev) |
+
+---
+
+## 🌐 Deployment
+
+Deployed on **Vercel** with **Neon PostgreSQL**. Every `git push` to `master` triggers an automatic redeploy.
+
+See [DEPLOY.md](DEPLOY.md) for the full step-by-step deployment guide.
+
+### Free Tier Limits
+
+| Service | Free Tier |
+|---------|-----------|
+| **Vercel** | 100 GB bandwidth/month, unlimited deploys |
+| **Neon** | 0.5 GB storage, 190 compute hours/month |
+| **Gemini API** | ~1,500 requests/day (resets at midnight PT) |
+
+---
+
+## 📡 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/articles` | GET | Fetch articles (`?q=`, `?category=`, `?limit=`, `?page=`) |
+| `/api/search` | GET | Search + AI article generation (`?q=query`) |
+| `/api/trending` | GET | Fetch trending topics (`?category=`) |
+| `/api/trending` | POST | Refresh trending topics with AI |
+| `/api/fact-check` | POST | AI fact-check an article (`{ articleId }`) |
+| `/api/auto-generate` | POST | Bulk generate articles from trending topics |
+| `/api/news` | GET | News feed |
+| `/api/auth/[...nextauth]` | * | NextAuth.js authentication handler |
+| `/api/auth/register` | POST | Register new user (`{ email, password, name }`) |
+
+---
+
+## 🐛 Bug Fixes Applied
+
+| Bug | Fix |
+|-----|-----|
+| Fake YouTube embeds (Rick Astley) | Removed hardcoded URLs, `youtubeUrl` made optional |
+| Shallow article content (~100 words) | Prompt updated for 300–500 word minimum |
+| Duplicate trending topics | Deduplication logic added |
+| `.env.local` had quotes around API keys | Removed single quotes, fixed stray `import http` line |
+| Trending click redirected to homepage | Shows error banner instead; DB-first lookup added |
+| Fact-check API error (404/429) | Fixed model names, added 4-model fallback chain |
+| Vercel "vulnerable Next.js" error | Updated from 15.5.6 → 16.1.6 |
+| `vercel.json` catch-all rewrite breaking APIs | Removed rewrite, kept only framework config |
+| SQLite incompatible with serverless | Migrated to PostgreSQL (Neon) |
+| Prisma EPERM on Windows | Kill node processes before `prisma generate` |
+| 2-minute latency on Vercel | Region alignment, caching, shorter prompts, fastest models |
+
+---
+
+## 📄 License
+
+This project is private and proprietary.
+
+---
+
+**Built with ❤️ by Unbiased Hindustani Media**
+
+**Version:** 2.0.0 | **Last Updated:** February 7, 2026
